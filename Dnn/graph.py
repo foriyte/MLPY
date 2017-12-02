@@ -20,19 +20,19 @@ class Graph():
         self.alpha = learnRate
         self.lossFunc = lossFunc
 
-    def addLayer(self,l,n,acfuncname):
+    def addLayer(self,l,n,acfuncname,l1=False,l2=False,lamba=0.1,keep_pro=1.0):
         if len(self.layerStack) == 0:
             if l != self.inputData.shape[1]:
                 print 'Exception: layer size is not match!'
                 return
-            curLayer = FullConnectLayer(l,n,acfuncname)
+            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro)
             self.layerStack.append(curLayer)
         else:
             preLayer = self.layerStack[-1]
             if l!= preLayer.n:
                 print 'Exception: layer size is not match!'
                 return
-            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha)
+            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro)
             self.layerStack.append(curLayer)
 
     def fowardOutput(self):
@@ -65,7 +65,9 @@ class Graph():
              self.layerStack[index-i].updateParameter(da)
              da = self.layerStack[index-i].backwardOutput(da)
 
-
+    def no_dropout(self):
+        for layer in self.layerStack:
+            layer.set_keep_pro(1)
 
 
 
