@@ -12,27 +12,29 @@ class Graph():
     batchsize = None
     alpha = None
     epsilon = 0.00000001
+    opt = None
 
-    def __init__(self,inputdata,labeldata,lossFunc,learnRate=0.01):
+    def __init__(self,inputdata,labeldata,lossFunc,learnRate=0.01,opt='sgd'):
         self.inputData = inputdata
         self.labelData = labeldata
         self.batchsize = len(inputdata)
         self.alpha = learnRate
         self.lossFunc = lossFunc
+        self.opt = opt
 
     def addLayer(self,l,n,acfuncname,l1=False,l2=False,lamba=0.1,keep_pro=1.0):
         if len(self.layerStack) == 0:
             if l != self.inputData.shape[1]:
                 print 'Exception: layer size is not match!'
                 return
-            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro)
+            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro,self.opt)
             self.layerStack.append(curLayer)
         else:
             preLayer = self.layerStack[-1]
             if l!= preLayer.n:
                 print 'Exception: layer size is not match!'
                 return
-            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro)
+            curLayer = FullConnectLayer(l,n,acfuncname,self.alpha,l1,l2,lamba,keep_pro,self.opt)
             self.layerStack.append(curLayer)
 
     def fowardOutput(self):
