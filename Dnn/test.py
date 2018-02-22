@@ -6,7 +6,8 @@ from graph import Graph
 def generateDataSet():
 
     dataset = np.random.randn(10000,1000)
-    datalabel = np.random.randint(0,2,(10000,1))
+    #datalabel = np.random.randint(0,2,(10000,1))
+    datalabel = np.random.rand(10000,1)
     #print dataset
     #print datalabel
     return dataset,datalabel
@@ -15,7 +16,7 @@ def generateDataSet():
 def test():
     dataset,datalabel = generateDataSet()
 
-    graph = Graph(dataset,datalabel,'log',0.01,opt='Adam')
+    graph = Graph(dataset,datalabel,'mse',0.01,opt='sgd')
     graph.addLayer(1000,512,'sigmoid')
     graph.addLayer(512,128,'sigmoid',l2=True)
     graph.addLayer(128,64,'sigmoid',keep_pro=0.5)

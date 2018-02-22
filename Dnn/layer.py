@@ -3,7 +3,7 @@ import numpy as np
 from acfunc import Acfunc
 
 
-class FullConnectLayer():
+class FullConnectLayer(object):
     l = None
     n = None
     omega = None
@@ -47,8 +47,9 @@ class FullConnectLayer():
             l1=False,l2=False,lamda=0.1,keep_pro=1.0,opt='sgd'):
         self.l = l
         self.n = n
-        self.acfunc = Acfunc(acfuncName)
-        if self.omega == None or self.beta == None:
+        if acfuncName is not None:
+            self.acfunc = Acfunc(acfuncName)
+        if self.omega is  None or self.beta is None:
             self.omega = np.random.randn(self.l,self.n)
             self.beta = np.zeros([1,self.n])
         self.alpha = learnRate
@@ -84,11 +85,9 @@ class FullConnectLayer():
     #正向传播
     def fowardOutput(self,inputData):
         if type(inputData) != np.ndarray:
-            print 'Exception: data type is not match!'
-            return
+            raise BaseException('Exception: data type is not match!')
         if inputData.shape[1] != self.l:
-            print 'Exception: data shape is not match!'
-            return
+            raise BaseException('Exception: data shape is not match!')
         self.inputa = inputData
         if self.keep_pro<1:
             self.dropout = np.random.rand(inputData.shape[0],inputData.shape[1])<self.keep_pro
@@ -96,7 +95,10 @@ class FullConnectLayer():
             #这样在测试中,就需要使用权重比例推断
             inputData = inputData/self.keep_pro
         self.z = np.dot(inputData,self.omega) + self.beta
-        self.gz = self.acfunc.computeOutput(self.z)
+        if self.acfunc is not None:
+            self.gz = self.acfunc.computeOutput(self.z)
+        else:
+            self.gz = self.z
         return self.gz
 
     #反向传播
@@ -104,7 +106,10 @@ class FullConnectLayer():
         return np.dot(inputA*self.acfunc.computeDiff(self.z),self.omega.T)
 
     def updateParameter(self,da):
-        dz = da*self.acfunc.computeDiff(self.z)/len(self.inputa)
+        if self.acfunc is not None:
+            dz = da*self.acfunc.computeDiff(self.z)/len(self.inputa)
+        else:
+            dz = da
         dw = np.dot(self.inputa.T,dz)
         if self.l2 == True:
             dw = dw + (self.lamda/len(self.inputa))*self.omega
